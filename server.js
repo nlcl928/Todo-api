@@ -42,12 +42,13 @@ app.get('/todos/:id', function(req, res) {
 
 // POST / todos
 app.post('/todos', function(req, res) {
-	var body = req.body;
+	var body = _.pick(req.body, 'description', 'complete'); //use _.pick to only pick description and complete
 
 	if (!_.isBoolean(body.complete) || !_.isString(body.description) || body.description.trim().length === 0) {
 		return res.status(400).send();
 	}
 
+	body.description = body.description.trim();
 	//add id field
 	body.id = todoNextId++;
 	
