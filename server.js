@@ -16,7 +16,26 @@ app.get('/', function(req, res) {
 
 //GET /todos?complete=true
 app.get('/todos', function(req, res) {
-	var queryParams = req.query;
+	var query = req.query;
+	var where = {};
+
+	if (query.hasOwnProperty('complete') && query.complete === 'true') {
+		where.complete = true;
+	} else if (query.hasOwnProperty('complete') && query.complete === 'false') {
+		where.complete = false;
+	}
+	if (query.hasOwnProperty('q') && query.q.length > 0) {
+		where.description = {
+			$like: '%' + query.q + '%'
+		};
+	}
+
+	db.todo.findAll({where : where}).then (function (todos) {
+		res.json(todos);
+	}, function (e) {
+		res.status(500).send();
+	});
+	/*
 	var filteredTodos = todos;
 
 	if (queryParams.hasOwnProperty('complete') && queryParams.complete === 'true') {
@@ -32,6 +51,7 @@ app.get('/todos', function(req, res) {
 	}
 
 	res.json(filteredTodos);
+	*/
 });
 
 // GET /todos/:id
